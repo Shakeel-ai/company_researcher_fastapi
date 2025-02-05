@@ -124,4 +124,4 @@ wheel==0.44.0
 wsproto==1.2.0
 yarl==1.18.3
 zstandard==0.23.0
-gunicorn
+uvicorn
