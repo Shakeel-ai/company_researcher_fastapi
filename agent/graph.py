@@ -3,7 +3,7 @@ from typing import cast, Any, Literal
 import json
 
 from tavily import AsyncTavilyClient
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import START, END, StateGraph
@@ -25,6 +25,8 @@ load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 tavily_api_key = os.getenv("TAVILY_API_KEY")
+os.environ["LANGSMITH_TRACING"] = os.getenv("LANGSMITH_TRACING")
+os.environ["LANGSMITH_API_KEY"] = os.getenv("LANGSMITH_API_KEY")
 # LLMs
 
 rate_limiter = InMemoryRateLimiter(
@@ -32,8 +34,8 @@ rate_limiter = InMemoryRateLimiter(
     check_every_n_seconds=0.1,
     max_bucket_size=10,  # Controls the maximum burst size.
 )
-claude_3_5_sonnet = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash", temperature=0, api_key=openai_api_key,rate_limiter=rate_limiter)
+claude_3_5_sonnet = ChatOpenAI(
+    model="gpt-4o-mini", temperature=0, api_key=openai_api_key,rate_limiter=rate_limiter)
 
 # Search
 
@@ -92,6 +94,7 @@ def generate_queries(state: OverallState, config: RunnableConfig) -> dict[str, A
 
     # Queries
     query_list = [query for query in results.queries]
+    print(query_list)
     return {"search_queries": query_list}
 
 
