@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Research and Information Extraction Tool</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='css/research.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <!-- ✅ Prevent form resubmission on page reload -->
+    <script>
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Company Research and Information Extraction Tool</h1>
+    </header>
+
+    <main>
+        <form method="post" action="/">
+            <div class="form-group">
+                <label for="company_name">Company Name:</label>
+                <input type="text" id="company_name" name="company_name" placeholder="Enter company name" required>
+            </div>
+            <div class="form-group">
+                <label for="max_search_queries">Max Search Queries:</label>
+                <input type="number" id="max_search_queries" name="max_search_queries" min="1" max="10" value="3">
+            </div>
+            <div class="form-group">
+                <label for="max_search_results">Max Search Results:</label>
+                <input type="number" id="max_search_results" name="max_search_results" min="1" max="8" value="3">
+            </div>
+            <div class="form-group">
+                <label for="max_reflection_steps">Max Reflection Steps:</label>
+                <input type="number" id="max_reflection_steps" name="max_reflection_steps" min="1" max="10" value="3">
+            </div>
+            <button type="submit">Run Graph</button>
+        </form>
+
+        <!-- Loading Spinner -->
+        <div id="loading-spinner">
+            <div class="spinner"></div>
+            <p>Searching... Please wait.</p>
+        </div>
+
+        {% if error_message %}
+            <section class="error-section">
+                <p class="error">Error: {{ error_message }}</p>
+            </section>
+        {% endif %}
+
+        {% if output_state %}
+        <div class="container">
+            <h1>Company Information</h1>
+            <div class="info">
+                <p><strong>Company Name:</strong> {{ company_name }}</p>
+                <p><strong>Founded:</strong> {% if founding_year %} {{ founding_year }} {% else %} N/A {% endif %}</p>
+                <p><strong>Founders:</strong> {% if founder_names %} {{ founder_names | join(', ') }} {% else %} N/A {% endif %}</p>
+                <p><strong>Product Description:</strong> {{ product_description }}</p>
+                <p><strong>Funding Summary:</strong> {% if funding_summary %} {{ funding_summary }} {% else %} N/A {% endif %}</p>
+            </div>
+            <h2>Open Job Positions</h2>
+            <div class="jobs">
+                {% for job in open_jobs %}
+                    <div class="job">
+                        <p><strong>Title:</strong> {{ job.job_title }}</p>
+                        <p><strong>Location:</strong> {% if job.job_location %} {{ job.job_location }} {% else %} Remote {% endif %}</p>
+                        <p><strong>Type:</strong> {% if job.job_type %} {{ job.job_type }} {% else %} Not Specified {% endif %}</p>
+                        <p><strong>Deadline:</strong> {{ job.last_date }}</p>
+                        <p><strong>Description:</strong> {% if job.job_description %} {{ job.job_description }} {% else %} No description available {% endif %}</p>
+                        <p><a href="{{ job.apply_link }}" target="_blank">Apply Here</a></p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Company Research Tool. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector("form");
+            const spinner = document.getElementById("loading-spinner");
+            const submitButton = form.querySelector("button");
+            
+            form.addEventListener("submit", function() {
+                spinner.style.display = "flex"; // Show spinner
+                submitButton.disabled = true; // Disable button to prevent multiple submissions
+            });
+        });
+    </script>
+</body>
+</html>
